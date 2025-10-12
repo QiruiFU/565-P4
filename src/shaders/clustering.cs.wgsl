@@ -32,23 +32,24 @@ fn isLightInAABB(lightPos: vec3<f32>, minB: vec3<f32>, maxB: vec3<f32>, radius: 
     return dist <= radius;
 }
 
-@compute @workgroup_size(${WORKGROUP_SIZE_X}, ${WORKGROUP_SIZE_Y}, ${WORKGROUP_SIZE_Z})
+@compute @workgroup_size(8, 8, 4)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-    if (global_id.x >= ${blockSizeX}u || global_id.y >= ${blockSizeY}u || global_id.z >= ${blockSizeZ}u) {
+    
+    if (global_id.x >= 8 || global_id.y >= 8 || global_id.z >= 8) {
         return;
     }
 
-    let idx = global_id.z * ${blockSizeX}u * ${blockSizeY}u + global_id.y * ${blockSizeX}u + global_id.x;
+    let idx = global_id.z * 8 * 8 + global_id.y * 8 + global_id.x;
     let cur_cluster_ptr = &(clusterSet.clusters[idx]);
     let lightSet_ptr = &(lightSet);
 
-    let left_bottom = vec2<f32>(global_id.xy) * camera.canvasResolution / vec2<f32>(${blockSizeX}, ${blockSizeY});
-    let right_top = (vec2<f32>(global_id.xy) + vec2<f32>(1.0, 1.0)) * camera.canvasResolution / vec2<f32>(${blockSizeX}, ${blockSizeY});
+    let left_bottom = vec2<f32>(global_id.xy) * camera.canvasResolution / vec2<f32>(8, 8);
+    let right_top = (vec2<f32>(global_id.xy) + vec2<f32>(1.0, 1.0)) * camera.canvasResolution / vec2<f32>(8, 8);
     let ndc_lb = 2.0 * (left_bottom / camera.canvasResolution) - vec2<f32>(1.0, 1.0);
     let ndc_rt = 2.0 * (right_top / camera.canvasResolution) - vec2<f32>(1.0, 1.0);
 
-    let tileNear = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z) / f32(${blockSizeZ}));
-    let tileFar = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z + 1u) / f32(${blockSizeZ}));
+    let tileNear = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z) / f32(8));
+    let tileFar = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z + 1u) / f32(8));
 
     var viewMin = camera.invProjMat * vec4<f32>(ndc_lb, -1.0, 1.0);
     var viewMax = camera.invProjMat * vec4<f32>(ndc_rt, -1.0, 1.0);

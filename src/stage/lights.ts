@@ -100,12 +100,12 @@ export class Lights {
         // TODO-2: initialize layouts, pipelines, textures, etc. needed for light clustering here
 
         const num_clusters = shaders.constants.clusterX * shaders.constants.clusterY * shaders.constants.clusterZ;
-        const cluster_size = 8 + 1024;
+        const cluster_size = 16 + 16 + 16 + 1024 * 4;
 
         this.clustersStorageBuffer = device.createBuffer({
             label: "Clusters",
-            size: 16 + num_clusters * cluster_size * 4,
-            usage: GPUBufferUsage.STORAGE
+            size: 16 + num_clusters * cluster_size,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
         });
 
         this.clustersBindGroupLayout = device.createBindGroupLayout({

@@ -14,13 +14,17 @@ struct LightSet {
 
 struct Cluster {
     minDep: vec3<f32>,
+    pad0: f32,                // padding
     maxDep: vec3<f32>,
+    pad1: f32,                // padding
     cntLights: u32,
+    pad2: vec3<u32>,          // padding to align lightIdx array to 16 bytes
     lightIdx: array<u32, 1024u>
 }
 
-struct CluserSet {
+struct ClusterSet {
     cntCluster: u32,
+    pad: vec3<u32>,           // padding to align clusters array
     clusters: array<Cluster>
 }
 
@@ -28,6 +32,7 @@ struct CameraUniforms {
     // TODO-1.3: add an entry for the view proj mat (of type mat4x4f)
     viewProjMat: mat4x4f,
     invProjMat: mat4x4f,
+    viewMat: mat4x4f,
     canvasResolution: vec2f,
     nearPlane: f32,
     farPlane: f32

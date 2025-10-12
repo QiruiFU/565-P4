@@ -56,7 +56,6 @@ export class ForwardPlusRenderer extends renderer.Renderer {
 
         this.pipeline = renderer.device.createRenderPipeline({
             layout: renderer.device.createPipelineLayout({
-                label: "naive pipeline layout",
                 bindGroupLayouts: [
                     this.sceneUniformsBindGroupLayout,
                     renderer.modelBindGroupLayout,
@@ -70,15 +69,13 @@ export class ForwardPlusRenderer extends renderer.Renderer {
             },
             vertex: {
                 module: renderer.device.createShaderModule({
-                    label: "naive vert shader",
                     code: shaders.naiveVertSrc
                 }),
                 buffers: [ renderer.vertexBufferLayout ]
             },
             fragment: {
                 module: renderer.device.createShaderModule({
-                    label: "naive frag shader",
-                    code: shaders.naiveFragSrc,
+                    code: shaders.forwardPlusFragSrc,
                 }),
                 targets: [
                     {
@@ -94,10 +91,10 @@ export class ForwardPlusRenderer extends renderer.Renderer {
         // - run the clustering compute shader
         // - run the main rendering pass, using the computed clusters for efficient lighting
         const encoder = renderer.device.createCommandEncoder();
+        this.lights.doLightClustering(encoder);
         const canvasTextureView = renderer.context.getCurrentTexture().createView();
 
         const renderPass = encoder.beginRenderPass({
-            label: "naive render pass",
             colorAttachments: [
                 {
                     view: canvasTextureView,
