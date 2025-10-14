@@ -32,24 +32,24 @@ fn isLightInAABB(lightPos: vec3<f32>, minB: vec3<f32>, maxB: vec3<f32>, radius: 
     return dist <= radius;
 }
 
-@compute @workgroup_size(8, 8, 4)
+@compute @workgroup_size(${BlockSizeX}, ${BlockSizeY}, ${BlockSizeZ})
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     
-    if (global_id.x >= 8 || global_id.y >= 8 || global_id.z >= 8) {
+    if (global_id.x >= ${clusterX} || global_id.y >= ${clusterY} || global_id.z >= ${clusterZ}) {
         return;
     }
 
-    let idx = global_id.z * 8 * 8 + global_id.y * 8 + global_id.x;
+    let idx = global_id.z * ${clusterX} * ${clusterY} + global_id.y * ${clusterX} + global_id.x;
     let cur_cluster_ptr = &(clusterSet.clusters[idx]);
     let lightSet_ptr = &(lightSet);
 
-    let left_bottom = vec2<f32>(global_id.xy) * camera.canvasResolution / vec2<f32>(8, 8);
-    let right_top = (vec2<f32>(global_id.xy) + vec2<f32>(1.0, 1.0)) * camera.canvasResolution / vec2<f32>(8, 8);
+    let left_bottom = vec2<f32>(global_id.xy) * camera.canvasResolution / vec2<f32>(${clusterX}, ${clusterY});
+    let right_top = (vec2<f32>(global_id.xy) + vec2<f32>(1.0, 1.0)) * camera.canvasResolution / vec2<f32>(${clusterX}, ${clusterY});
     let ndc_lb = 2.0 * (left_bottom / camera.canvasResolution) - vec2<f32>(1.0, 1.0);
     let ndc_rt = 2.0 * (right_top / camera.canvasResolution) - vec2<f32>(1.0, 1.0);
 
-    let tileNear = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z) / f32(8));
-    let tileFar = camera.nearPlane * pow(camera.nearPlane / camera.farPlane, f32(global_id.z + 1u) / f32(8));
+    let tileNear = camera.nearPlane * pow(camera.farPlane / camera.nearPlane, f32(global_id.z) / f32(${clusterZ}));
+    let tileFar = camera.nearPlane * pow(camera.farPlane / camera.nearPlane, f32(global_id.z + 1u) / f32(${clusterZ}));
 
     var viewMin = camera.invProjMat * vec4<f32>(ndc_lb, -1.0, 1.0);
     var viewMax = camera.invProjMat * vec4<f32>(ndc_rt, -1.0, 1.0);
@@ -66,13 +66,14 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
     var lightCount = 0u;
     let maxLightsPerCluster = 1024u;
-    let lightRadius = f32(${lightRadius});
 
     for (var i = 0u; i < (*lightSet_ptr).numLights; i++) {
         let light = (*lightSet_ptr).lights[i];
         let lightPosView = (camera.viewMat * vec4<f32>(light.pos, 1.0)).xyz;
 
-        if (isLightInAABB(lightPosView, (*cur_cluster_ptr).minDep, (*cur_cluster_ptr).maxDep, lightRadius)) {
+        let closest = clamp(lightPosView, (*cur_cluster_ptr).minDep, (*cur_cluster_ptr).maxDep);
+        let dis = distance(lightPosView, closest);
+        if(dis <= f32(${lightRadius})){
             if (lightCount < maxLightsPerCluster) {
                 (*cur_cluster_ptr).lightIdx[lightCount] = i;
                 lightCount++;
