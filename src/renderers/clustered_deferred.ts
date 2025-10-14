@@ -30,7 +30,6 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
         // TODO-3: initialize layouts, pipelines, textures, etc. needed for Forward+ here
         // you'll need two pipelines: one for the G-buffer pass and one for the fullscreen pass
         this.sceneUniformsBindGroupLayout = renderer.device.createBindGroupLayout({
-            label: "scene uniforms bind group layout",
             entries: [
                 {
                     binding: 0,
@@ -51,7 +50,6 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
         });
 
         this.sceneUniformsBindGroup = renderer.device.createBindGroup({
-            label: "scene uniforms bind group",
             layout: this.sceneUniformsBindGroupLayout,
             entries: [
                 {
@@ -92,7 +90,7 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
 
         this.deferredGroupLayout = renderer.device.createBindGroupLayout({
             entries: [
-                { // albedoTexture
+                {
                     binding: 0,
                     visibility: GPUShaderStage.FRAGMENT,
                     texture: {}
@@ -100,33 +98,22 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
                 {
                     binding: 1,
                     visibility: GPUShaderStage.FRAGMENT,
-                    sampler: {}
+                    texture: {}
                 },
-                { // normalTexture
+                {
                     binding: 2,
                     visibility: GPUShaderStage.FRAGMENT,
-                    texture: {}
+                    texture: {sampleType: "depth"}
                 },
                 {
                     binding: 3,
                     visibility: GPUShaderStage.FRAGMENT,
                     sampler: {}
-                },
-                { // depthTexture
-                    binding: 4,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    texture: { sampleType: "depth" }
-                },
-                {
-                    binding: 5,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    sampler: {}
-                },
+                }
             ]
         });
 
         this.deferredBindGroup = renderer.device.createBindGroup({
-            label: "material bind group",
             layout: this.deferredGroupLayout,
             entries: [
                 {
@@ -135,25 +122,16 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
                 },
                 {
                     binding: 1,
-                    resource: renderer.device.createSampler()
+                    resource: this.normalTextureView
                 },
                 {
                     binding: 2,
-                    resource: this.normalTextureView
+                    resource: this.depthTextureView
                 },
                 {
                     binding: 3,
                     resource: renderer.device.createSampler()
-                },
-                {
-                    binding: 4,
-                    resource: this.depthTextureView
-                },
-                {
-                    binding: 5,
-                    resource: renderer.device.createSampler()
-                },
-                
+                }
             ]
         });
 
@@ -172,14 +150,12 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
             },
             vertex: {
                 module: renderer.device.createShaderModule({
-                    label: "naive vert shader",
                     code: shaders.naiveVertSrc,
                 }),
                 buffers: [ renderer.vertexBufferLayout ]
             },
             fragment: {
                 module: renderer.device.createShaderModule({
-                    label: "Deferred cluster frag shader",
                     code: shaders.clusteredDeferredFragSrc
                 }),
                 targets: [
@@ -265,7 +241,6 @@ export class ClusteredDeferredRenderer extends renderer.Renderer {
 
         const canvasTextureView = renderer.context.getCurrentTexture().createView();
         const FullscreenPass = encoder.beginRenderPass({
-            label: "Fullscreen render pass",
             colorAttachments: [
                 {
                     view: canvasTextureView,
