@@ -26,12 +26,6 @@
 @group(${bindGroup_scene}) @binding(1) var<storage, read> lightSet: LightSet;
 @group(${bindGroup_scene}) @binding(2) var<storage, read_write> clusterSet: ClusterSet;
 
-fn isLightInAABB(lightPos: vec3<f32>, minB: vec3<f32>, maxB: vec3<f32>, radius: f32) -> bool {
-    let closest = clamp(lightPos, minB, maxB);
-    let dist = distance(lightPos, closest);
-    return dist <= radius;
-}
-
 @compute @workgroup_size(${BlockSizeX}, ${BlockSizeY}, ${BlockSizeZ})
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     
@@ -65,7 +59,6 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     (*cur_cluster_ptr).maxDep = max(max(minBoundsPos1, maxBoundsPos1), max(maxBoundsPos2, minBoundsPos2));
 
     var lightCount = 0u;
-    let maxLightsPerCluster = 1024u;
 
     for (var i = 0u; i < (*lightSet_ptr).numLights; i++) {
         let light = (*lightSet_ptr).lights[i];
@@ -74,7 +67,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         let closest = clamp(lightPosView, (*cur_cluster_ptr).minDep, (*cur_cluster_ptr).maxDep);
         let dis = distance(lightPosView, closest);
         if(dis <= f32(${lightRadius})){
-            if (lightCount < maxLightsPerCluster) {
+            if (lightCount < 1024u) {
                 (*cur_cluster_ptr).lightIdx[lightCount] = i;
                 lightCount++;
             }
