@@ -9,8 +9,10 @@ WebGL Forward+ and Clustered Deferred Shading
 
 ### Demo GIF
 
-<!-- <img src="img/stay.gif"> -->
-<!-- <img src="img/move.gif"> -->
+https://github.com/user-attachments/assets/bf1abdaa-e290-4d2a-82c3-d5f609dbd047
+
+https://github.com/user-attachments/assets/bb9e95bd-2bd0-429f-a4d4-77347e5d744d
+
 
 ### README
 #### Features
