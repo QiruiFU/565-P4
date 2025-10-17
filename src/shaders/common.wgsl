@@ -19,7 +19,7 @@ struct Cluster {
     pad1: f32,                // padding
     cntLights: u32,
     pad2: vec3<u32>,          // padding to align lightIdx array to 16 bytes
-    lightIdx: array<u32, 1024u>
+    lightIdx: array<u32, ${maxLightsPerCluster}>
 }
 
 struct ClusterSet {

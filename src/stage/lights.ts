@@ -14,7 +14,7 @@ export class Lights {
     private camera: Camera;
 
     numLights = 500;
-    static readonly maxNumLights = 5000;
+    static readonly maxNumLights = 50000;
     static readonly numFloatsPerLight = 8; // vec3f is aligned at 16 byte boundaries
 
     static readonly lightIntensity = 0.1;
@@ -100,7 +100,7 @@ export class Lights {
         // TODO-2: initialize layouts, pipelines, textures, etc. needed for light clustering here
 
         const num_clusters = shaders.constants.clusterX * shaders.constants.clusterY * shaders.constants.clusterZ;
-        const cluster_size = 16 + 16 + 16 + 1024 * 4;
+        const cluster_size = 16 + 16 + 16 + 10000 * 4;
 
         this.clustersStorageBuffer = device.createBuffer({
             label: "Clusters",
