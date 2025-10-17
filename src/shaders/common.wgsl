@@ -12,6 +12,8 @@ struct LightSet {
 
 // TODO-2: you may want to create a ClusterSet struct similar to LightSet
 
+const MAX_LIGHTS_PER_CLUSTER: u32 = 3000u;
+
 struct Cluster {
     minDep: vec3<f32>,
     pad0: f32,                // padding
@@ -19,8 +21,8 @@ struct Cluster {
     pad1: f32,                // padding
     cntLights: u32,
     pad2: vec3<u32>,          // padding to align lightIdx array to 16 bytes
-    lightIdx: array<u32, 3000u>
-}
+    lightIdx: array<u32, MAX_LIGHTS_PER_CLUSTER>,
+};
 
 struct ClusterSet {
     cntCluster: u32,
