@@ -36,9 +36,9 @@ export const constants = {
 
     lightRadius: 2,
 
-    clusterX : 12,
-    clusterY : 12,
-    clusterZ : 16,
+    clusterX : 16,
+    clusterY : 16,
+    clusterZ : 8,
 
     BlockSizeX : 8,
     BlockSizeY : 8,
