@@ -67,7 +67,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         let closest = clamp(lightPosView, (*cur_cluster_ptr).minDep, (*cur_cluster_ptr).maxDep);
         let dis = distance(lightPosView, closest);
         if(dis <= f32(${lightRadius})){
-            if (lightCount < ${maxLightsPerCluster}) {
+            if (lightCount < 3000u) {
                 (*cur_cluster_ptr).lightIdx[lightCount] = i;
                 lightCount++;
             }
