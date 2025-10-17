@@ -51,8 +51,16 @@ function evalShaderRaw(raw: string) {
 
 const commonSrc: string = evalShaderRaw(commonRaw);
 
+// function processShaderRaw(raw: string) {
+//     return commonSrc + evalShaderRaw(raw);
+// }
+
 function processShaderRaw(raw: string) {
-    return commonSrc + evalShaderRaw(raw);
+    let src = commonSrc + raw;
+    Object.entries(constants).forEach(([k, v]) => {
+        src = src.replaceAll(`\${${k}}`, String(v));
+    });
+    return src;
 }
 
 export const naiveVertSrc: string = processShaderRaw(naiveVertRaw);
